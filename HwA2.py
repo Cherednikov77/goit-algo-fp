@@ -18,8 +18,11 @@ def draw_tree(t, l, depth):
     t.backward(l)
     
 def main():
+    
     try:
-        user_depth = int(input("Enter the depth of the tree (non-negative integer): "))
+        user_input = input("Enter the depth of the tree (non-negative integer): ")
+        user_depth = int(user_input) if user_input else 7
+
     except ValueError:
         print("Invalid input. Please enter a non-negative integer.")
         user_depth = 7
@@ -28,9 +31,13 @@ def main():
     screen.tracer(0)
     t = turtle.Turtle()
     t.speed(0)
+    t.penup()
+    t.goto(0, -200)
+    t.pendown()
     t.left(90)
 
-    draw_tree(t, 100, 10)
+    draw_tree(t, 100, user_depth)
+    print("Tree drawing complete.")
     screen.update()
     screen.mainloop()
 
@@ -283,4 +290,57 @@ if __name__ == "__main__":
     visualize_traversal(tree_graph, 'A', "BFS")
     visualize_traversal(tree_graph, 'A', "DFS")
 
-   
+   #####
+import uuid
+import matplotlib.pyplot as plt
+import networkx as nx
+class Node:
+  def __init__(self, key, color="skyblue"):
+        self.left = None
+        self.right = None
+        self.val = key
+        self.color = color
+        self.id = str(uuid.uuid4())
+def add_edges(graph, node, pos, x=0, y=0, layer=1):
+    if node is not None:
+        graph.add_node(node.id, color=node.color, label=node.val)
+        
+        if node.left:
+            graph.add_edge(node.id, node.left.id)
+            l = x - 1 / 2**layer
+            pos[node.left.id] = (l, y - 1)
+            add_edges(graph, node.left, pos, x=x-1, y=y-1, layer=layer+1)
+        if node.right:
+            graph.add_edge(node.id, node.right.id)
+            r = x + 1 / 2**layer
+            pos[node.right.id] = (r, y -1)
+            add_edges(graph, node.right, pos, x=x+1, y=y-1, layer=layer+1)
+    return graph
+    
+def draw_tree(tree_root):
+        tree = nx.DiGraph()
+        pos = {tree_root.id: (0, 0)}
+        tree = add_edges(tree, tree_root, pos)
+        colors = [data.get('color', 'skyblue') for node, data in tree.nodes(data=True)]
+
+        labels = {node: data.get('label', '') for node, data in tree.nodes(data=True)}
+
+        plt.figure(figsize=(12, 8))
+        nx.draw(tree, pos=pos, labels=labels, arrows=False, node_size=2500, node_color=colors, font_size=10, font_weight='bold', font_color='black')
+        plt.show()
+
+def build_heap_tree(heap, index=0):
+        if index >= len(heap):
+            return None
+        node = Node(heap[index])
+        left_index = 2 * index + 1
+        right_index = 2 * index + 2
+        node.left = build_heap_tree(heap, left_index)
+        node.right = build_heap_tree(heap, right_index)
+        return node
+    
+
+        
+heap_list = [10, 15, 30, 40, 50, 100, 40, 80, 90]
+heap_root = build_heap_tree(heap_list)
+draw_tree(heap_root)

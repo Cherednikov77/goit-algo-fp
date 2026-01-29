@@ -97,18 +97,24 @@ def monte_carlo_dice(n_simulations=1000):
         die2 = random.randint(1, 6)
         total = die1 + die2
         results[total] += 1
-    probabilities = {s: count / n_simulations for s, count in results.items()}
+    probabilities = {s: (count / n_simulations) * 100 for s, count in results.items()}
     return results, probabilities
-n = 1000 
-counts, probs = monte_carlo_dice(n)
+teoretical_probs = {2: 1/36, 3: 2/36, 4: 3/36, 5: 4/36, 6: 5/36, 7: 6/36,
+                    8: 5/36, 9: 4/36, 10: 3/36, 11: 2/36, 12: 1/36}
+n = 1000
+counts, mc_probs = monte_carlo_dice(n)
+
 print(f"{'sum':<10} {'frequency':<10} {'probability (%)':<15}")
-print(f"{s:<10} {counts[s]:<10} {probs[s]*100:<15.2f}" for s in range(2, 13))
+for s in range(2, 13):
+    print(f"{s:<10} {counts[s]:<10} {mc_probs[s]:<15.2f} | {teoretical_probs[s]:<10.2f}")
+
 plt.figure(figsize=(10, 6))
 plt.bar(counts.keys(), counts.values(), width=0.6, color='skyblue', edgecolor='black')
 plt.xlabel('Sum of Two Dice')
 plt.ylabel('Frequency')
 plt.title(f'Dice Roll Simulation Results (n={n})')
 plt.xticks(range(2, 13))
+
 plt.show()
 
 ######
